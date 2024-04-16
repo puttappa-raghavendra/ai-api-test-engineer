@@ -20,13 +20,13 @@ prompt = hub.pull("hwchase17/openai-functions-agent")
 prompt.messages
 
 # init llm
-llm = ChatOpenAI(openai_api_key=getenv('OPENAI_API_KEY'))
+llm = ChatOpenAI(openai_api_key=getenv('OPENAI_API_KEY'), temperature=0)
 
 agent = create_tool_calling_agent(llm, tools, prompt)
 
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-input = '''Generate API test cases for list virtualmachines api'''
+input = '''Generate test case for the list virtual machines api'''
 
 agent_executor.invoke({"input": input})
 

@@ -4,9 +4,9 @@ from langchain.tools import BaseTool, StructuredTool, tool
 # define the code generation format 
 class Code(BaseModel):
     """Code Output"""
-    filename: str = Field(..., description="The filename for the code")
+    filename: str = Field(..., description="The filename of the code")
     imports: str = Field(..., description="The imports for the code")
-    code: str = Field(..., description="Generated code")
+    code: str = Field(..., description="Generated test cases for the given acceptence criteria")
 
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langchain_core.output_parsers.openai_tools import PydanticToolsParser
@@ -21,13 +21,16 @@ pydantic_parser = PydanticToolsParser(tools=[Code])
 llm_with_tools = llm.bind_tools(tools, tool_choice={ "type": "function", "function": { "name": "Code"}} )
 
 template = '''You are a expert python software engineer. You are tasked to generate python test cases for the given openapi specification and acceptence criteria.
+
 Openapi Specification: 
     {openapi_specification}
+    
 Acceptence Criteria:
     {acceptence_criteria}
 
-Generate python test cases for acceptence criteria mentioned above.
 For test cases use pytest framework and generate test cases covering all the acceptence criteria.
+We are generating the test cases which run against the actual API endpoints.
+Generate the test case for each acceptence criteria and make sure to cover all the scenarios.
 Structure your answer with the description of the code solution.
 Then list the imports and the code block.
 '''
