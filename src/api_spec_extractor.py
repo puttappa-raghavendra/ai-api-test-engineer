@@ -43,3 +43,4 @@ def get_api_spec(path, method, openapi_spec_path) -> str:
             return operation_details
 
     return None
+
