@@ -1,0 +1,271 @@
+openapi: 3.0.0
+info:
+  title: Virtual Machine Management API
+  description: API for managing virtual machines
+  version: 1.0.0
+servers:
+  - url: https://example.com/api/v1
+paths:
+  /virtualmachines:
+    get:
+      summary: Retrieve virtual machines
+      description: |
+        Retrieves a list of virtual machines. You can filter virtual machines by status.
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: Filter virtual machines by status (e.g., running, stopped, paused)
+      responses:
+        '200':
+          description: A list of virtual machines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VirtualMachine'
+              examples:
+                allVirtualMachines:
+                  value:
+                    - id: 1
+                      name: VM1
+                      os: Ubuntu
+                      memory: 4096
+                      storage: 50
+                      status: running
+        '400':
+          description: Bad request, check your query parameters
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to access this resource
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+    post:
+      summary: Create a new virtual machine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VirtualMachineInput'
+      responses:
+        '201':
+          description: The created virtual machine
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualMachine'
+              examples:
+                createdVM:
+                  value:
+                    id: 2
+                    name: NewVM
+                    os: CentOS
+                    memory: 2048
+                    storage: 100
+                    status: stopped
+        '400':
+          description: Bad request, check your input data
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to perform this action
+        '500':
+          description: Internal server error
+  /virtualmachines/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Retrieve a virtual machine by ID
+      responses:
+        '200':
+          description: The requested virtual machine
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualMachine'
+              examples:
+                foundVM:
+                  value:
+                    id: 2
+                    name: NewVM
+                    os: CentOS
+                    memory: 2048
+                    storage: 100
+                    status: stopped
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to access this resource
+        '404':
+          description: Virtual machine not found
+        '500':
+          description: Internal server error
+    put:
+      summary: Update a virtual machine by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VirtualMachineInput'
+      responses:
+        '200':
+          description: The updated virtual machine
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualMachine'
+              examples:
+                updatedVM:
+                  value:
+                    id: 2
+                    name: UpdatedVM
+                    os: CentOS
+                    memory: 2048
+                    storage: 100
+                    status: stopped
+        '400':
+          description: Bad request, check your input data
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to perform this action
+        '404':
+          description: Virtual machine not found
+        '500':
+          description: Internal server error
+    delete:
+      summary: Delete a virtual machine by ID
+      responses:
+        '204':
+          description: Virtual machine successfully deleted
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to perform this action
+        '404':
+          description: Virtual machine not found
+        '500':
+          description: Internal server error
+  /virtualmachines/{id}/start:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      summary: Start a virtual machine by ID
+      responses:
+        '200':
+          description: The virtual machine has been started
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to perform this action
+        '404':
+          description: Virtual machine not found or cannot be started
+        '500':
+          description: Internal server error
+  /virtualmachines/{id}/stop:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      summary: Stop a virtual machine by ID
+      responses:
+        '200':
+          description: The virtual machine has been stopped
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to perform this action
+        '404':
+          description: Virtual machine not found or cannot be stopped
+        '500':
+          description: Internal server error
+  /virtualmachines/{id}/restart:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      summary: Restart a virtual machine by ID
+      responses:
+        '200':
+          description: The virtual machine has been restarted
+        '401':
+          description: Unauthorized, authentication required
+        '403':
+          description: Forbidden, you are not authorized to perform this action
+        '404':
+          description: Virtual machine not found or cannot be restarted
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    VirtualMachine:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        os:
+          type: string
+        memory:
+          type: integer
+          description: Memory in MB
+        storage:
+          type: integer
+          description: Storage in GB
+        status:
+          type: string
+          description: Current status of the virtual machine
+          enum:
+            - running
+            - stopped
+            - paused
+      required:
+        - name
+        - os
+        - memory
+        - storage
+    VirtualMachineInput:
+      type: object
+      properties:
+        name:
+          type: string
+        os:
+          type: string
+        memory:
+          type: integer
+          description: Memory in MB
+        storage:
+          type: integer
+          description: Storage in GB
+      required:
+        - name
+        - os
+        - memory
+        - storage
